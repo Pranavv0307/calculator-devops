@@ -34,6 +34,12 @@ public class CalculatorServer {
     }
 
     private static void handleOp(HttpExchange exchange, String op) throws IOException {
+        if (!"GET".equals(exchange.getRequestMethod())) {
+            sendMethodNotAllowed(exchange);
+            return;
+        }
+
+
         Map<String, String> params = queryToMap(exchange.getRequestURI());
         String aStr = params.get("a");
         String bStr = params.get("b");
@@ -72,6 +78,11 @@ public class CalculatorServer {
     }
 
     private static void handleHealth(HttpExchange exchange) throws IOException {
+        if (!"GET".equals(exchange.getRequestMethod())) {
+            sendMethodNotAllowed(exchange);
+            return;
+        }
+
         sendJson(exchange, 200, "{\"status\":\"UP\"}");
     }
 
@@ -103,5 +114,10 @@ public class CalculatorServer {
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(bytes);
         }
+    }
+
+    private static void sendMethodNotAllowed(HttpExchange exchange) throws IOException {
+        exchange.getResponseHeaders().set("Allow", "GET");
+        sendJson(exchange, 405, "{\"error\":\"Method Not Allowed\",\"allowed\":\"GET\"}");
     }
 }
