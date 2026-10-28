@@ -56,4 +56,14 @@ class CalculatorServerIntegrationTest {
                 .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
+
+    @Test
+    void add_withPost_returns405() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + TEST_PORT + "/api/v1/add?a=2&b=3"))
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(405, response.statusCode());
+    }
 }
