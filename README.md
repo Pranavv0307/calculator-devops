@@ -18,25 +18,36 @@ Produces `target/calculator.jar`.
 ```
 Runs unit tests (`CalculatorTest`) and an HTTP integration test (`CalculatorServerIntegrationTest`).
 
-## Run
+## Run (locally, without Docker)
 
 ```bash
 java -jar target/calculator.jar
 ```
 Starts the server on `http://localhost:8080`.
 
+## Run with Docker
+
+```bash
+docker build -t calculator:local .
+docker run -p 8080:8080 calculator:local
+```
+The image is built in two stages: a `maven:3.9-eclipse-temurin-17` stage compiles
+and packages the JAR, and a minimal `eclipse-temurin:17-jre-alpine` stage runs it
+as a non-root user. Only the final JAR is copied into the runtime image.
+
 ## API
 
-| Method | Endpoint              | Description                  |
-|--------|-----------------------|-------------------------------|
-| GET    | `/api/v1/add`         | Add two numbers               |
-| GET    | `/api/v1/subtract`    | Subtract two numbers          |
-| GET    | `/api/v1/multiply`    | Multiply two numbers          |
-| GET    | `/api/v1/divide`      | Divide two numbers            |
-| GET    | `/actuator/health`    | Health check (`{"status":"UP"}`) |
+| Method | Endpoint              | Description                        |
+|--------|-----------------------|-------------------------------------|
+| GET    | `/api/v1/add`         | Add two numbers                     |
+| GET    | `/api/v1/subtract`    | Subtract two numbers                |
+| GET    | `/api/v1/multiply`    | Multiply two numbers                |
+| GET    | `/api/v1/divide`      | Divide two numbers                  |
+| GET    | `/actuator/health`    | Health check (`{"status":"UP"}`)    |
 
 All arithmetic endpoints take two query params, `a` and `b`. Missing/non-numeric
-params and divide-by-zero return HTTP 400.
+params and divide-by-zero return HTTP 400. Non-GET requests to any endpoint
+return HTTP 405.
 
 ### Example
 
@@ -46,5 +57,5 @@ curl "http://localhost:8080/api/v1/add?a=2&b=3"
 ```
 
 ---
-*Docker, Docker Compose, and Jenkins pipeline instructions will be added here
-as those parts of the project are completed.*
+*Docker Compose and Jenkins pipeline instructions will be added here as those
+parts of the project are completed.*
