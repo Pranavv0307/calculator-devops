@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDS = credentials('dockerhub-creds')
-        IMAGE_NAME = "<your-dockerhub-username>/calculator-devops"
+        IMAGE_NAME = "pranav0307/calculator-devops"
         IMAGE_TAG  = "${env.BUILD_NUMBER}"
     }
 
@@ -57,12 +57,12 @@ pipeline {
 
     post {
         success {
-            mail to: '<your-student-email>',
+            mail to: 'pranav.sandeeps@gmail.com',
                  subject: "SUCCESS: Pipeline #${env.BUILD_NUMBER}",
                  body: "The calculator-devops pipeline succeeded. Image: ${IMAGE_NAME}:${IMAGE_TAG}"
         }
         failure {
-            mail to: '<your-student-email>',
+            mail to: 'pranav.sandeeps@gmail.com',
                  subject: "FAILED: Pipeline #${env.BUILD_NUMBER}",
                  body: "The calculator-devops pipeline failed. Check Jenkins console output."
         }
