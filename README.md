@@ -49,11 +49,32 @@ waits for it to report healthy before accepting traffic. Both containers use
 `restart: unless-stopped`.
 
 ```bash
-docker ps                                      # confirm both containers are up/healthy
-curl "http://localhost:8080/api/v1/add?a=2&b=3"  # now going through nginx
-docker compose logs -f                          # watch logs
-docker compose down                             # tear down
+docker ps                                        # confirm both containers are up/healthy
+curl "http://localhost:8080/api/v1/add?a=2&b=3"   # now going through nginx
+docker compose logs -f                            # watch logs
+docker compose down                                # tear down
 ```
+
+## CI/CD Pipeline (Jenkins)
+
+The `Jenkinsfile` defines a pipeline with five stages: **Checkout → Build → Test →
+Docker Build → Push → Deploy**.
+
+- **Trigger**: Poll SCM, checking GitHub for new commits on `main` roughly every
+  5 minutes. (A real GitHub webhook was considered but requires a public tunnel
+  such as ngrok since Jenkins runs on `localhost` here; Poll SCM is used instead,
+  per the assignment's allowance for this fallback.)
+- **Build/Test**: runs `./mvnw clean package` and `./mvnw test`, publishing JUnit
+  XML results via the `junit` step.
+- **Docker Build/Push**: builds the image and pushes it to Docker Hub as
+  [`pranav0307/calculator-devops`](https://hub.docker.com/r/pranav0307/calculator-devops),
+  tagged with both the Jenkins build number and `latest`. Docker Hub credentials
+  are stored in Jenkins' Credentials store (`dockerhub-creds`), never hard-coded.
+- **Deploy**: runs `docker compose down` then `docker compose up -d --build`
+  to redeploy the stack, then verifies the deployment with a health check against
+  `/actuator/health`.
+- **Notifications**: a success or failure email is sent via Jenkins' SMTP
+  configuration (Gmail) after every run.
 
 ## API
 
@@ -75,6 +96,3 @@ return HTTP 405.
 curl "http://localhost:8080/api/v1/add?a=2&b=3"
 # {"operation":"add","a":2.0,"b":3.0,"result":5.0}
 ```
-
----
-*Jenkins pipeline instructions will be added here once the CI/CD setup is complete.*
