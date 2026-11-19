@@ -73,7 +73,7 @@ public class CalculatorServer {
         }
 
         String json = String.format(
-                "{\"operation\":\"%s\",\"a\":%s,\"b\":%s,\"result\":%s}", op, a, b, result);
+                "{\"operation\":\"%s\",\"a\":%s,\"b\":%s,\"result\":%s, \"note\":\"demo\"}", op, a, b, result);
         sendJson(exchange, 200, json);
     }
 
